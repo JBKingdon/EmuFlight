@@ -107,6 +107,8 @@ typedef struct voltageMeterADCState_s {
     uint16_t voltageFiltered;         // battery voltage in 0.1V steps (filtered)
     uint16_t voltageUnfiltered;       // battery voltage in 0.1V steps (unfiltered)
     biquadFilter_t filter;
+    uint16_t voltageFilteredHiRes;    // battery voltage in 0.01V steps (filtered)
+    biquadFilter_t filterHiRes;       // filter for hires voltage
 } voltageMeterADCState_t;
 
 extern voltageMeterADCState_t voltageMeterADCStates[MAX_VOLTAGE_SENSOR_ADC];
@@ -152,6 +154,13 @@ STATIC_UNIT_TESTED uint16_t voltageAdcToVoltage(const uint16_t src, const voltag
     return ((((uint32_t)src * config->vbatscale * getVrefMv() / 100 + (0xFFF * 5)) / (0xFFF * config->vbatresdivval)) / config->vbatresdivmultiplier);
 }
 
+uint16_t voltageAdcToVoltageHires(const uint16_t src, const voltageSensorADCConfig_t *config)
+{
+    // calculate battery voltage based on ADC reading
+    // result is Vbatt in 0.01V steps.
+    return ((((uint32_t)src * config->vbatscale * getVrefMv() / 10 + (0xFFF * 5)) / (0xFFF * config->vbatresdivval)) / config->vbatresdivmultiplier);
+}
+
 void voltageMeterADCRefresh(void)
 {
     for (uint8_t i = 0; i < MAX_VOLTAGE_SENSOR_ADC; i++) {
@@ -165,10 +174,12 @@ void voltageMeterADCRefresh(void)
         uint16_t rawSample = adcGetChannel(channel);
 
         uint16_t filteredSample = biquadFilterApply(&state->filter, rawSample);
+        uint16_t filteredSampleHires = biquadFilterApply(&state->filterHiRes, rawSample);
 
         // always calculate the latest voltage, see getLatestVoltage() which does the calculation on demand.
         state->voltageFiltered = voltageAdcToVoltage(filteredSample, config);
         state->voltageUnfiltered = voltageAdcToVoltage(rawSample, config);
+        state->voltageFilteredHiRes = voltageAdcToVoltageHires(filteredSampleHires, config);
 #else
         UNUSED(voltageAdcToVoltage);
 
@@ -184,6 +195,7 @@ void voltageMeterADCRead(voltageSensorADC_e adcChannel, voltageMeter_t *voltageM
 
     voltageMeter->filtered = state->voltageFiltered;
     voltageMeter->unfiltered = state->voltageUnfiltered;
+    voltageMeter->filteredHires = state->voltageFilteredHiRes;
 }
 
 void voltageMeterADCInit(void)
@@ -195,6 +207,7 @@ void voltageMeterADCInit(void)
         memset(state, 0, sizeof(voltageMeterADCState_t));
 
         biquadFilterInitLPF(&state->filter, GET_BATTERY_LPF_FREQUENCY(batteryConfig()->vbatLpfPeriod), HZ_TO_INTERVAL_US(50));
+        biquadFilterInitLPF(&state->filterHiRes, GET_BATTERY_LPF_FREQUENCY(batteryConfig()->vbatHiresLpfPeriod), HZ_TO_INTERVAL_US(50)); // TODO separate filter period
     }
 }
 

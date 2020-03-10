@@ -62,6 +62,7 @@ typedef struct batteryConfig_s {
 
     uint8_t forceBatteryCellCount;          // Number of cells in battery, used for overwriting auto-detected cell count if someone has issues with it.
     uint8_t vbatLpfPeriod;                  // Period of the cutoff frequency for the Vbat filter (in 0.1 s)
+    uint8_t vbatHiresLpfPeriod;             // Period of the cutoff frequency for the Vbat filter (in 0.1 s)
     uint8_t ibatLpfPeriod;                  // Period of the cutoff frequency for the Ibat filter (in 0.1 s)
     uint8_t vbatDurationForWarning;         // Period voltage has to sustain before the battery state is set to BATTERY_WARNING (in 0.1 s)
     uint8_t vbatDurationForCritical;        // Period voltage has to sustain before the battery state is set to BATTERY_CRIT (in 0.1 s)
@@ -101,6 +102,7 @@ float calculateVbatCompensation(uint8_t vbatCompType, uint8_t vbatCompRef);
 uint8_t calculateBatteryPercentageRemaining(void);
 bool isBatteryVoltageConfigured(void);
 uint16_t getBatteryVoltage(void);
+uint16_t getBatteryVoltageHires(void);
 uint16_t getBatteryVoltageLatest(void);
 uint8_t getBatteryCellCount(void);
 uint16_t getBatteryAverageCellVoltage(void);

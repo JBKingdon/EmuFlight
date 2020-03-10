@@ -693,6 +693,7 @@ const clivalue_t valueTable[] = {
     { "cbat_alert_percent",         VAR_UINT8  | MASTER_VALUE, .config.minmax = { 0, 100 }, PG_BATTERY_CONFIG, offsetof(batteryConfig_t, consumptionWarningPercentage) },
     { "vbat_cutoff_percent",        VAR_UINT8  | MASTER_VALUE, .config.minmax = { 0, 100 }, PG_BATTERY_CONFIG, offsetof(batteryConfig_t, lvcPercentage) },
     { "vbat_lpf_period",            VAR_UINT8  | MASTER_VALUE, .config.minmax = { 0, UINT8_MAX }, PG_BATTERY_CONFIG, offsetof(batteryConfig_t, vbatLpfPeriod) },
+    { "vbatHires_lpf_period",       VAR_UINT8  | MASTER_VALUE, .config.minmax = { 0, UINT8_MAX }, PG_BATTERY_CONFIG, offsetof(batteryConfig_t, vbatHiresLpfPeriod) },
     { "ibat_lpf_period",            VAR_UINT8  | MASTER_VALUE, .config.minmax = { 0, UINT8_MAX }, PG_BATTERY_CONFIG, offsetof(batteryConfig_t, ibatLpfPeriod) },
     { "force_battery_cell_count",   VAR_UINT8  | MASTER_VALUE, .config.minmax = { 0, 24 }, PG_BATTERY_CONFIG, offsetof(batteryConfig_t, forceBatteryCellCount) },
 //  PG_VOLTAGE_SENSOR_ADC_CONFIG

@@ -223,7 +223,7 @@ static char osdGetMetersToSelectedUnitSymbol(void)
  */
 static int osdGetBatteryAverageCellVoltage(void)
 {
-    return (getBatteryVoltage() * 10) / getBatteryCellCount();
+    return (getBatteryVoltageHires()) / getBatteryCellCount();
 }
 
 static char osdGetBatterySymbol(int cellVoltage)

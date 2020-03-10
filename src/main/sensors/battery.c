@@ -116,6 +116,7 @@ PG_RESET_TEMPLATE(batteryConfig_t, batteryConfig,
     .vbatfullcellvoltage = 41,
 
     .vbatLpfPeriod = 35,
+    .vbatHiresLpfPeriod = 90,
     .ibatLpfPeriod = 40,
     .vbatDurationForWarning = 0,
     .vbatDurationForCritical = 0,
@@ -148,6 +149,7 @@ void batteryUpdateVoltage(timeUs_t currentTimeUs)
     if (debugMode == DEBUG_BATTERY) {
         debug[0] = voltageMeter.unfiltered;
         debug[1] = voltageMeter.filtered;
+        debug[2] = voltageMeter.filteredHires;
     }
 }
 
@@ -462,7 +464,7 @@ float calculateVbatCompensation(uint8_t vbatCompType, uint8_t vbatCompRef)
 {
     float factor =  1.0f;
     if (vbatCompType != VBAT_COMP_TYPE_OFF && batteryConfig()->voltageMeterSource != VOLTAGE_METER_NONE && batteryCellCount > 0) {
-        float vbat = (float) voltageMeter.filtered / batteryCellCount;
+        float vbat = (((float) voltageMeter.filteredHires)/10.0f) / batteryCellCount;
         if (vbat) {
             factor = vbatCompRef / vbat;
             factor *= factor;
@@ -511,6 +513,11 @@ bool isBatteryVoltageConfigured(void)
 uint16_t getBatteryVoltage(void)
 {
     return voltageMeter.filtered;
+}
+
+uint16_t getBatteryVoltageHires(void)
+{
+    return voltageMeter.filteredHires;
 }
 
 uint16_t getBatteryVoltageLatest(void)
